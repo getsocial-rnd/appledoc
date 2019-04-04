@@ -177,6 +177,7 @@
 		B4D1FFE515FF5F05009736E2 /* DDXcodeProjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		B4D1FFE615FF5F05009736E2 /* DDXcodeProjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		B8BBC0F7196DFAEB006F239D /* dd_getopt_long-fbsd.m in Sources */ = {isa = PBXBuildFile; fileRef = DA77C690196BEB2C0018A48F /* dd_getopt_long-fbsd.m */; };
+		BC5F9939225629F1003D314A /* GBExtendableTypedefEnumData.m in Sources */ = {isa = PBXBuildFile; fileRef = BC5F9938225629F1003D314A /* GBExtendableTypedefEnumData.m */; };
 		BC78C64E2253FD3E00C28514 /* GBExternConstantDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */; };
 		C8005C9D1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = C8005C9C1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m */; };
 		C8005C9E1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = C8005C9C1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m */; };
@@ -395,6 +396,8 @@
 		B4D1FFD315FF5F05009736E2 /* DDXcodeProjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDXcodeProjectFile.h; sourceTree = "<group>"; };
 		B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDXcodeProjectFile.m; sourceTree = "<group>"; };
 		B4D1FFF615FF643D009736E2 /* install-appledoc.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-appledoc.sh"; sourceTree = "<group>"; };
+		BC5F9937225629F1003D314A /* GBExtendableTypedefEnumData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBExtendableTypedefEnumData.h; sourceTree = "<group>"; };
+		BC5F9938225629F1003D314A /* GBExtendableTypedefEnumData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GBExtendableTypedefEnumData.m; sourceTree = "<group>"; };
 		BC78C64C2253FD3E00C28514 /* GBExternConstantDefinition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBExternConstantDefinition.h; sourceTree = "<group>"; };
 		BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GBExternConstantDefinition.m; sourceTree = "<group>"; };
 		C567680F1958403800E8E4C8 /* GBTypedefBlockData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBTypedefBlockData.h; sourceTree = "<group>"; };
@@ -741,6 +744,8 @@
 				C5676813195840BD00E8E4C8 /* GBTypedefBlockArgument.m */,
 				BC78C64C2253FD3E00C28514 /* GBExternConstantDefinition.h */,
 				BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */,
+				BC5F9937225629F1003D314A /* GBExtendableTypedefEnumData.h */,
+				BC5F9938225629F1003D314A /* GBExtendableTypedefEnumData.m */,
 			);
 			name = Store;
 			sourceTree = "<group>";
@@ -1230,6 +1235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				73D54C6211F8CE6D00CCDDB0 /* appledoc.m in Sources */,
+				BC5F9939225629F1003D314A /* GBExtendableTypedefEnumData.m in Sources */,
 				73D54CA911F8D27F00CCDDB0 /* GBLog.m in Sources */,
 				73D54D1E11F8D53E00CCDDB0 /* DDCliApplication.m in Sources */,
 				73D54D1F11F8D53E00CCDDB0 /* DDCliParseException.m in Sources */,

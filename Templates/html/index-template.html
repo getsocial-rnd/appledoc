@@ -84,14 +84,17 @@
 							</ul>
 							{{/hasProtocols}}
 
-							{{#hasConstants}}
+							{{#showConstants}}
 							<h2 class="index-title">{{strings.indexPage.constantsTitle}}</h2>
 							<ul>
 								{{#constants}}
 									<li><a href="{{href}}">{{title}}</a></li>
 								{{/constants}}
+                                {{#extendableTypedefEnums}}
+                                <li><a href="{{href}}">{{title}}</a></li>
+                                {{/extendableTypedefEnums}}
 							</ul>
-							{{/hasConstants}}
+							{{/showConstants}}
 
 							{{#hasCategories}}
 							<h2 class="index-title">{{strings.indexPage.categoriesTitle}}</h2>

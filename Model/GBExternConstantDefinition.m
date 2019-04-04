@@ -44,6 +44,11 @@
     return self.attributes.count > 0;
 }
 
+- (NSString*) attributesDescription
+{
+    return [self.attributes componentsJoinedByString:@" "];
+}
+
 @synthesize constantName = _constantName;
 @synthesize constantType = _constantType;
 @synthesize attributes = _attributes;

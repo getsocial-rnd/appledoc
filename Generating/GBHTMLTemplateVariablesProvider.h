@@ -97,7 +97,10 @@
 - (NSDictionary *)variablesForBlocks:(GBTypedefBlockData *)typedefBlock withStore:(id)store;
 
 - (NSDictionary *)variablesForExternConstantDefinition:(GBExternConstantDefinition *)object withStore:(id)store;
-/** Returns the variables for the given `GBDocumentData` using the given `GBStore` for links. 
+
+- (NSDictionary *)variablesForExtendableTypedefEnum:(GBExtendableTypedefEnumData *)extendableTypedefEnum withStore:(id)aStore;
+
+/** Returns the variables for the given `GBDocumentData` using the given `GBStore` for links.
  
  The result can be used with `GBTemplateHandler` to generate document specific output.
  

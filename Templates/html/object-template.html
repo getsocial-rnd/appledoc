@@ -97,11 +97,46 @@
                     {{/comment}}
                     <div class="section">
                     <h4 class="method-subtitle">Definition</h4>
-                    <div class="method-subsection method-declaration"><code>extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributes}}{{/hasAttributes}};</code></div>
+                    <div class="method-subsection method-declaration"><code>extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};</code></div>
                     </div>
                     </div>
                     {{/externConstantDefinition}}
                     <!-- extern constants end -->
+
+                    <!-- extendable typedef enums start -->
+                    {{#extendableTypedefEnumData}}
+                    </br>
+                    {{#comment}}
+                    {{#hasLongDescription}}
+                    <div class="section section-overview">
+                        {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
+                    </div>
+                    {{/hasLongDescription}}
+                    {{/comment}}
+                    <div class="section">
+                        <h4 class="method-subtitle">Definition</h4>
+                        <div class="method-subsection method-declaration"><code>typedef {{typeDefType}} {{typeDefName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};</code></div>
+                    </div>
+                    {{#hasPredefinedValues}}
+                    <div class="section">
+                        <h4 class="method-subtitle">Predefined values</h4>
+                        {{#predefinedValues}}
+                        </br>
+                        <div class="method-subsection method-declaration">
+                            <code>
+                                {{#comment}}
+                                {{#hasLongDescription}}
+                                {{#longDescription}}{{>GBCommentComponentsListAsText}}</br>{{/longDescription}}
+                                {{/hasLongDescription}}
+                                {{/comment}}
+                                extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};
+                            </code>
+                        </div>
+                        {{/predefinedValues}}
+                    </div>
+                    {{/hasPredefinedValues}}
+                    {{/extendableTypedefEnumData}}
+                    <!-- extendable typedef enums start -->
 
                     {{#typedefEnum}}
                     <h3 class="subsubtitle method-title">{{nameOfEnum}}</h3>
@@ -304,6 +339,10 @@ Section GBCommentComponentsList
 {{#components}}{{>GBCommentComponent}}{{/components}}
 EndSection
 
+Section GBCommentComponentsListAsText
+{{#components}}// {{>GBCommentComponentAsText}}{{/components}}
+EndSection
+
 Section BlocksDefList
 <h3 class="subsubtitle method-title">{{nameOfBlock}}</h3>
 {{#comment}}
@@ -376,6 +415,10 @@ EndSection
 
 Section GBCommentComponent
 {{&htmlValue}}
+EndSection
+
+Section GBCommentComponentAsText
+{{&textValue}}
 EndSection
 
 Section ObjectSpecification

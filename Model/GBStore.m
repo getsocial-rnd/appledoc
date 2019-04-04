@@ -35,6 +35,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 		_customDocumentsByKey = [[NSMutableDictionary alloc] init];
         _externConstantDefinitions = [[NSMutableSet alloc] init];
         _externConstantDefinitionsByName = [[NSMutableDictionary alloc] init];
+        _extendableTypedefEnums = [[NSMutableSet alloc] init];
+        _extendableTypedefEnumsByName = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -85,6 +87,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 {
     NSArray *descriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"constantName" ascending:YES]];
     return [[self.externConstantDefinitions allObjects] sortedArrayUsingDescriptors:descriptors];
+}
+
+- (NSArray *)extendableTypedefEnumsSortedByName
+{
+    NSArray *descriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]];
+    return [[self.extendableTypedefEnums allObjects] sortedArrayUsingDescriptors:descriptors];
 }
 
 
@@ -158,6 +166,27 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
     
     [_externConstantDefinitions addObject:externConstantDef];
     _externConstantDefinitionsByName[externConstantDef.constantName] = externConstantDef;
+    
+    // check if there is a typedef to add this as possible value
+    GBExtendableTypedefEnumData* typeDef = [self extendableTypedefEnumDataWithName:externConstantDef.constantType];
+    if (typeDef) {
+        [typeDef addPredefinedValue:externConstantDef];
+    }
+}
+
+-(void)registerExtendableTypedefEnum:(GBExtendableTypedefEnumData *)extendableTypedefEnum
+{
+    NSParameterAssert(extendableTypedefEnum != nil);
+    GBLogDebug(@"Registering extendable typedef enum %@...", extendableTypedefEnum);
+    if ([_extendableTypedefEnums containsObject:extendableTypedefEnum]) return;
+    GBExtendableTypedefEnumData *existingExtendableTypedefEnum = _extendableTypedefEnumsByName[extendableTypedefEnum.typeDefName];
+    if (existingExtendableTypedefEnum) {
+        GBLogWarn(@"Ignoring extendable typedef enum %@, already defined.", extendableTypedefEnum);
+        return;
+    }
+    
+    [_extendableTypedefEnums addObject:extendableTypedefEnum];
+    _extendableTypedefEnumsByName[extendableTypedefEnum.typeDefName] = extendableTypedefEnum;
 }
 
 -(void)registerTypedefBlock:(GBTypedefBlockData *)typedefBlock
@@ -252,6 +281,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
     return _externConstantDefinitionsByName[name];
 }
 
+- (GBExtendableTypedefEnumData*)extendableTypedefEnumDataWithName:(NSString*)name
+{
+    return _extendableTypedefEnumsByName[name];
+}
+
 @synthesize classes = _classes;
 @synthesize categories = _categories;
 @synthesize protocols = _protocols;
@@ -260,5 +294,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 @synthesize documents = _documents;
 @synthesize customDocuments = _customDocuments;
 @synthesize externConstantDefinitions = _externConstantDefinitions;
+@synthesize extendableTypedefEnums = _extendableTypedefEnums;
 
 @end

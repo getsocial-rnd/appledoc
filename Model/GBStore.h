@@ -15,6 +15,7 @@
 @class GBTypedefEnumData;
 @class GBTypedefBlockData;
 @class GBExternConstantDefinition;
+@class GBExtendableTypedefEnumData;
 
 /** Implements the application's in-memory objects data store.
  
@@ -38,6 +39,8 @@
 	NSMutableDictionary *_customDocumentsByKey;
     NSMutableSet *_externConstantDefinitions;
     NSMutableDictionary *_externConstantDefinitionsByName;
+    NSMutableSet *_extendableTypedefEnums;
+    NSMutableDictionary *_extendableTypedefEnumsByName;
 }
 
 + (instancetype) sharedStore;
@@ -135,6 +138,8 @@
 
 -(void)registerExternConstantDefinition:(GBExternConstantDefinition *)externConstantDefinition;
 
+-(void)registerExtendableTypedefEnum:(GBExtendableTypedefEnumData*)extendableTypedefEnum;
+
 ///---------------------------------------------------------------------------------------
 /// @name Data handling
 ///---------------------------------------------------------------------------------------
@@ -180,6 +185,8 @@
 - (GBTypedefBlockData *)typedefBlockWithName:(NSString *)name;
 
 - (GBExternConstantDefinition *)externConstantDefinitionWithName:(NSString *)name;
+
+- (GBExtendableTypedefEnumData *)extendableTypedefEnumDataWithName:(NSString *)name;
 
 /** Returns the document instance that matches the given path.
  
@@ -252,6 +259,8 @@
 
 @property (readonly) NSSet *externConstantDefinitions;
 
+@property (readonly) NSSet *extendableTypedefEnums;
+
 ///---------------------------------------------------------------------------------------
 /// @name Helper methods
 ///---------------------------------------------------------------------------------------
@@ -276,5 +285,6 @@
 
 /** Returns all registered constants sorted by their name. */
 - (NSArray *)externConstantDefinitionsSortedByName;
+- (NSArray *)extendableTypedefEnumsSortedByName;
 
 @end

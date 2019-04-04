@@ -52,6 +52,7 @@
 	if (![self processDocuments:error]) return NO;
     if (![self processConstants:error]) return NO;
     if (![self processExternConstantDefinitions:error]) return NO;
+    if (![self processExtendableTypedefEnumData:error]) return NO;
     if (![self processBlocks:error]) return NO;
 	if (![self processIndex:error]) return NO;
 	if (![self processHierarchy:error]) return NO;
@@ -142,6 +143,24 @@
     }
     return YES;
 }
+
+- (BOOL)processExtendableTypedefEnumData:(NSError **)error {
+    for (GBExtendableTypedefEnumData *enumData in self.store.extendableTypedefEnums) {
+        if (!enumData.includeInOutput) continue;
+        GBLogInfo(@"Generating output for extendable typedef %@...", enumData);
+        NSDictionary *vars = [self.variablesProvider variablesForExtendableTypedefEnum:enumData withStore:self.store];
+        NSString *output = [self.htmlObjectTemplate renderObject: vars];
+        NSString *cleaned = [self stringByCleaningHtml:output];
+        NSString *path = [self htmlOutputPathForObject:enumData];
+        if (![self writeString:cleaned toFile:[path stringByStandardizingPath] error:error]) {
+            GBLogWarn(@"Failed writing HTML for extendable typedef enum declaration %@ to '%@'!", enumData, path);
+            return NO;
+        }
+        GBLogDebug(@"Finished generating output for extendable typedef enum def %@.", enumData);
+    }
+    return YES;
+}
+
 - (BOOL)processBlocks:(NSError **)error {
     for (GBTypedefBlockData *blockTypedef in self.store.blocks) {
         if (!blockTypedef.includeInOutput) continue;

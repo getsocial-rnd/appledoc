@@ -85,6 +85,7 @@
 		result[@"seeAlsoTitle"] = NSLocalizedString(@"See Also", @"See Also");
 		result[@"declaredInTitle"] = NSLocalizedString(@"Declared In", @"Declared In");
         result[@"externConstantDefinitions"] = NSLocalizedString(@"Constants", @"Constants");
+        result[@"extendableTypedefEnums"] = NSLocalizedString(@"Constants", @"Constants");
 	}
 	return result;
 }

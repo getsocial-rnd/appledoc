@@ -21,6 +21,7 @@
 - (void)processBlocks;
 - (void)processDocuments;
 - (void)processExternConstantDefinition;
+- (void)processExtendableTypedefEnumData;
 
 - (void)processMethodsFromProvider:(GBMethodsProvider *)provider;
 - (void)processCommentForObject:(GBModelBase *)object;
@@ -83,6 +84,7 @@
     [self processBlocks];
 	[self processDocuments];
     [self processExternConstantDefinition];
+    [self processExtendableTypedefEnumData];
 }
 
 - (void)processClasses {
@@ -114,6 +116,21 @@
         GBLogDebug(@"Finished processing extern constant def %@.", def);
     }
 }
+
+- (void)processExtendableTypedefEnumData {
+    NSArray *defs = [self.store.extendableTypedefEnums allObjects];
+    for (GBExtendableTypedefEnumData *def in defs) {
+        GBLogInfo(@"Processing extendable typedef enum %@...", def);
+        self.currentContext = def;
+        if (![self removeUndocumentedObject:def]) {
+            [self processCommentForObject:def];
+            [self validateCommentsForObjectAndMembers:def];
+            [self processHtmlReferencesForObject:def];
+        }
+        GBLogDebug(@"Finished processing extendable typedef enum def %@.", def);
+    }
+}
+
 
 - (void)processCategories {
 	NSArray *categories = [self.store.categories allObjects];

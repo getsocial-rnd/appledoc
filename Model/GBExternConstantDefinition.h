@@ -19,9 +19,11 @@
 
 +(id)externConstantDefinitionWithName:(NSString *)name type:(NSString*)type attributes:(NSArray*)attributes;
 
+
 @property (readonly) NSString *constantName;
 @property (readonly) NSString *constantType;
 @property (readonly) NSArray *attributes;
 @property (readonly) BOOL hasAttributes;
+@property (readonly) NSString* attributesDescription;
 
 @end

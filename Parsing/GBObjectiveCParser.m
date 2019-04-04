@@ -420,9 +420,75 @@
 	if ([self matchObjectDefinition]) return YES;
 	if ([self matchObjectDeclaration]) return YES;
     if ([self matchTypedefBlockDefinitionForProvider]) return YES;
+    if ([self matchExtendableTypedefEnum]) return YES;
     if ([self matchTypedefEnumDefinition]) return YES;
     if ([self matchExternConstantDefinition]) return YES;
 	return NO;
+}
+
+- (BOOL)matchExtendableTypedefEnum
+{
+//    typedef NSString *GetSocialNotificationType NS_EXTENSIBLE_STRING_ENUM;
+
+    if (![[self.tokenizer currentToken] matches:@"typedef"]) {
+        return NO;
+    }
+    BOOL isExtendableTypeDefEnum = [[self.tokenizer lookahead:4] matches:@"NS_EXTENSIBLE_STRING_ENUM"];
+    if (!isExtendableTypeDefEnum) {
+        return NO;
+    }
+    PKToken *startToken = [self.tokenizer currentToken];
+    
+    GBSourceInfo *startInfo = [self.tokenizer sourceInfoForCurrentToken];
+    
+    GBLogVerbose(@"GVTypeDef 0 token [%@]", [self.tokenizer currentToken].stringValue);
+    // consume "typedef"
+    [self.tokenizer consume:1];
+    
+    GBLogVerbose(@"GVTypeDef 1 token [%@]", [self.tokenizer currentToken].stringValue);
+    
+    NSString* type = [self.tokenizer currentToken].stringValue;
+    
+    [self.tokenizer consume:1];
+    
+    GBLogVerbose(@"GVTypeDef 2 token [%@]", [self.tokenizer currentToken].stringValue);
+    
+    __block NSString* name;
+    
+    if ([self.tokenizer currentToken].symbol) {
+        type = [type stringByAppendingString:[self.tokenizer currentToken].stringValue];
+    } else {
+        name = [self.tokenizer currentToken].stringValue;
+    }
+    
+    [self.tokenizer consume:1];
+    
+    GBLogVerbose(@"GVTypeDef 3 token [%@]", [self.tokenizer currentToken].stringValue);
+    
+    __block NSMutableArray* attributes = [NSMutableArray array];
+    while(![[self.tokenizer currentToken] matches:@";"]) {
+        if (name == nil) {
+            name = [self.tokenizer currentToken].stringValue;
+        } else {
+            [attributes addObject:[self.tokenizer currentToken].stringValue];
+        }
+        [self.tokenizer consume:1];
+    }
+    
+    GBLogVerbose(@"GVTypeDef x + 1 [%@]", [self.tokenizer currentToken].stringValue);
+    
+    GBLogVerbose(@"Matched %@ extendable typedef enum at line %lu, type [%@]", name, startInfo.lineNumber, type);
+    
+    GBExtendableTypedefEnumData *newTypeDef = [GBExtendableTypedefEnumData extendableTypedefWithName:name type:type attributes:attributes];
+    newTypeDef.includeInOutput = self.includeInOutput;
+    
+    [newTypeDef registerSourceInfo:startInfo];
+    GBComment *lastComment = [tokenizer lastComment];
+    [self registerComment:lastComment toObject:newTypeDef startingWith:startToken];
+    [self.tokenizer resetComments];
+    
+    [self.store registerExtendableTypedefEnum:newTypeDef];
+    return YES;
 }
 
 - (BOOL)matchExternConstantDefinition
@@ -633,8 +699,6 @@
     BOOL isTypeDefOptions = [[self.tokenizer lookahead:1] matches:@"NS_OPTIONS"];
     BOOL hasOpenBracket = [[self.tokenizer lookahead:2] matches:@"("];
 
-    BOOL isExtendableTypeDefEnum = NO;//[[self.tokenizer lookahead:4] matches:@"NS_EXTENSIBLE_STRING_ENUM"];
-
     /**
      typedef NSString* GetSocialNotificationStatus NS_EXTENSIBLE_STRING_ENUM;
      typedef NS_ENUM(NSUInteger, GetSocialActivitiesFilter) {
@@ -646,128 +710,98 @@
         return NO;
     }
     
-    if(((isSimpleTypeDefEnum || isTypeDefOptions) && hasOpenBracket) || isExtendableTypeDefEnum)
+    if(((isSimpleTypeDefEnum || isTypeDefOptions) && hasOpenBracket))
     {
-        GBLogVerbose(@"GV: isExpandable [%d]", isExtendableTypeDefEnum);
         __block PKToken *startToken = [self.tokenizer currentToken];
         
-        if (isExtendableTypeDefEnum) {
-            [self.tokenizer consume:1]; //consume 'typedef'
-
-            //get the enum type
-            NSString *typedefType = [[self.tokenizer currentToken] stringValue];
-            [self.tokenizer consume:2];
-
-            //get the typename
-            NSString *typedefName = [[self.tokenizer currentToken] stringValue];
-            [self.tokenizer consume:1];
-            
-            GBSourceInfo *startInfo = [tokenizer sourceInfoForCurrentToken];
-            GBComment *lastComment = [tokenizer lastComment];
-            GBLogVerbose(@"GV comment [%@]", lastComment);
-            GBLogVerbose(@"Matched %@ typedef enum definition at line %lu.", typedefName, startInfo.lineNumber);
-            
-            GBTypedefEnumData *newEnum = [GBTypedefEnumData typedefEnumWithName:typedefName];
-            newEnum.includeInOutput = self.includeInOutput;
-            newEnum.enumPrimitive = typedefType;
-            
-            [newEnum registerSourceInfo:startInfo];
-            [self registerComment:lastComment toObject:newEnum startingWith:startToken];
-            [self.tokenizer resetComments];
-            
-            [self.tokenizer consume:1];
-            [self.store registerTypedefEnum:newEnum];
-            return YES;
-        } else {
-            [self.tokenizer consume:3];  //consume 'typedef' 'NS_ENUM' and '('
-            
-            //get the enum type
-            NSString *typedefType = [[self.tokenizer currentToken] stringValue];
-            [self.tokenizer consume:1];
-            
-            //consume ','
-            [self.tokenizer consume:1];
-            
-            //get the typename
-            NSString *typedefName = [[self.tokenizer currentToken] stringValue];
-            [self.tokenizer consume:1];
-            
-            //consume ')'
-            [self.tokenizer consume:1];
-            
-            GBSourceInfo *startInfo = [tokenizer sourceInfoForCurrentToken];
-            GBComment *lastComment = [tokenizer lastComment];
-            GBLogVerbose(@"Matched %@ typedef enum definition at line %lu.", typedefName, startInfo.lineNumber);
-            
-            GBTypedefEnumData *newEnum = [GBTypedefEnumData typedefEnumWithName:typedefName];
-            newEnum.includeInOutput = self.includeInOutput;
-            newEnum.enumPrimitive = typedefType;
-            newEnum.isOptions = isTypeDefOptions;
-            
-            [newEnum registerSourceInfo:startInfo];
-            [self registerComment:lastComment toObject:newEnum startingWith:startToken];
-            [self.tokenizer resetComments];
-            
-            //[self.tokenizer consume:1];
-            startToken = [self.tokenizer currentToken];
-            [self.tokenizer consumeFrom:@"{" to:@"}" usingBlock:^(PKToken *token, BOOL *consume, BOOL *stop)
+        [self.tokenizer consume:3];  //consume 'typedef' 'NS_ENUM' and '('
+        
+        //get the enum type
+        NSString *typedefType = [[self.tokenizer currentToken] stringValue];
+        [self.tokenizer consume:1];
+        
+        //consume ','
+        [self.tokenizer consume:1];
+        
+        //get the typename
+        NSString *typedefName = [[self.tokenizer currentToken] stringValue];
+        [self.tokenizer consume:1];
+        
+        //consume ')'
+        [self.tokenizer consume:1];
+        
+        GBSourceInfo *startInfo = [tokenizer sourceInfoForCurrentToken];
+        GBComment *lastComment = [tokenizer lastComment];
+        GBLogVerbose(@"Matched %@ typedef enum definition at line %lu.", typedefName, startInfo.lineNumber);
+        
+        GBTypedefEnumData *newEnum = [GBTypedefEnumData typedefEnumWithName:typedefName];
+        newEnum.includeInOutput = self.includeInOutput;
+        newEnum.enumPrimitive = typedefType;
+        newEnum.isOptions = isTypeDefOptions;
+        
+        [newEnum registerSourceInfo:startInfo];
+        [self registerComment:lastComment toObject:newEnum startingWith:startToken];
+        [self.tokenizer resetComments];
+        
+        //[self.tokenizer consume:1];
+        startToken = [self.tokenizer currentToken];
+        [self.tokenizer consumeFrom:@"{" to:@"}" usingBlock:^(PKToken *token, BOOL *consume, BOOL *stop)
+         {
+             /* ALWAYS start with the name of the Constant */
+             
+             startToken = token;
+             GBEnumConstantData *newConstant = [GBEnumConstantData constantWithName:[token stringValue]];
+             GBSourceInfo *filedata = [tokenizer sourceInfoForToken:token];
+             [newConstant registerSourceInfo:filedata];
+             [newConstant setParentObject:newEnum];
+             
+             GBComment *comment = [self.tokenizer lastComment];
+             
+             [self.tokenizer consume:1];
+             [self.tokenizer resetComments];
+             
+             [self consumeMacro];
+             
+             if([[self.tokenizer currentToken] matches:@"="])
              {
-                 /* ALWAYS start with the name of the Constant */
-                 
-                 startToken = token;
-                 GBEnumConstantData *newConstant = [GBEnumConstantData constantWithName:[token stringValue]];
-                 GBSourceInfo *filedata = [tokenizer sourceInfoForToken:token];
-                 [newConstant registerSourceInfo:filedata];
-                 [newConstant setParentObject:newEnum];
-                 
-                 GBComment *comment = [self.tokenizer lastComment];
-                 
                  [self.tokenizer consume:1];
-                 [self.tokenizer resetComments];
                  
-                 [self consumeMacro];
+                 //collect the stringvalues until a ',' is detected.
+                 NSMutableArray *values = [NSMutableArray array];
                  
-                 if([[self.tokenizer currentToken] matches:@"="])
+                 while(![[tokenizer currentToken] matches:@","] && ![[tokenizer currentToken] matches:@"}"])
                  {
-                     [self.tokenizer consume:1];
-                     
-                     //collect the stringvalues until a ',' is detected.
-                     NSMutableArray *values = [NSMutableArray array];
-                     
-                     while(![[tokenizer currentToken] matches:@","] && ![[tokenizer currentToken] matches:@"}"])
+                     if(![self consumeMacro])
                      {
-                         if(![self consumeMacro])
-                         {
-                             [values addObject:[[tokenizer currentToken] stringValue]];
-                             [tokenizer consume:1];
-                         }
+                         [values addObject:[[tokenizer currentToken] stringValue]];
+                         [tokenizer consume:1];
                      }
-                     
-                     NSString *value = [values componentsJoinedByString:@" "];
-                     [newConstant setAssignedValue:value];
                  }
                  
-                 if([[self.tokenizer currentToken] matches:@","])
-                 {
-                     [tokenizer consume:1];
-                 }
-                 
-                 [self registerComment:comment toObject:newConstant startingWith:startToken];
-                 startToken = [self.tokenizer currentToken];
-                 
-                 *consume = NO;
-                 
-                 [newEnum.constants registerConstant:newConstant];
-             }];
-            
-            //if there is a macro, consume it.
-            [self consumeMacro];
-            
-            //consume ;
-            [self.tokenizer consume:1];
-            [self.store registerTypedefEnum:newEnum];
-            return YES;
-        }
+                 NSString *value = [values componentsJoinedByString:@" "];
+                 [newConstant setAssignedValue:value];
+             }
+             
+             if([[self.tokenizer currentToken] matches:@","])
+             {
+                 [tokenizer consume:1];
+             }
+             
+             [self registerComment:comment toObject:newConstant startingWith:startToken];
+             startToken = [self.tokenizer currentToken];
+             
+             *consume = NO;
+             
+             [newEnum.constants registerConstant:newConstant];
+         }];
+        
+        //if there is a macro, consume it.
+        [self consumeMacro];
+        
+        //consume ;
+        [self.tokenizer consume:1];
+        [self.store registerTypedefEnum:newEnum];
+        return YES;
     }
     else
     {

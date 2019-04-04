@@ -39,12 +39,14 @@
 - (NSString *)pageTitleForConstant:(GBTypedefEnumData *)object;
 - (NSString *)pageTitleForBlock:(GBTypedefBlockData *)object;
 - (NSString *)pageTitleForExternConstantDefinition:(GBExternConstantDefinition *)object;
+- (NSString *)pageTitleForExtendableTypedefEnumData:(GBExtendableTypedefEnumData *)object;
 - (NSDictionary *)specificationsForClass:(GBClassData *)object;
 - (NSDictionary *)specificationsForCategory:(GBCategoryData *)object;
 - (NSDictionary *)specificationsForProtocol:(GBProtocolData *)object;
 - (NSDictionary *)specificationsForConstant:(GBTypedefEnumData *)object;
 - (NSDictionary *)specificationsForBlock:(GBTypedefBlockData *)object;
 - (NSDictionary *)specificationsForExternConstantDefinition:(GBExternConstantDefinition *)object;
+- (NSDictionary *)specificationsForExtendedTypedefEnumData:(GBExtendableTypedefEnumData *)object;
 
 @end
 
@@ -79,6 +81,7 @@
 - (NSArray *)classesForHierarchy;
 - (NSArray *)constantsForIndex;
 - (NSArray *)externConstantDefinitionsForIndex;
+- (NSArray *)extendableTypedefEnumsForIndex;
 - (NSArray *)blocksForIndex;
 - (NSArray *)arrayFromHierarchyLevel:(NSDictionary *)level;
 - (void)registerObjectsUsageForIndexInDictionary:(NSMutableDictionary *)dict;
@@ -183,6 +186,21 @@
     return result;
 }
 
+- (NSDictionary *)variablesForExtendableTypedefEnum:(GBExtendableTypedefEnumData *)extendableTypedefEnum withStore:(id)aStore {
+    self.store = aStore;
+    NSMutableDictionary *page = [NSMutableDictionary dictionary];
+    page[@"title"] = [self pageTitleForExtendableTypedefEnumData:extendableTypedefEnum];
+    page[@"specifications"] = [self specificationsForExtendedTypedefEnumData:extendableTypedefEnum];
+    [self addFooterVarsToDictionary:page];
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    result[@"page"] = page;
+    result[@"extendableTypedefEnumData"] = extendableTypedefEnum;
+    result[@"projectCompany"] = self.settings.projectCompany;
+    result[@"projectName"] = self.settings.projectName;
+    result[@"strings"] = self.settings.stringTemplates;
+    return result;
+}
+
 - (NSDictionary *)variablesForBlocks:(GBTypedefBlockData *)typedefBlock withStore:(id)aStore {
     self.store = aStore;
     NSMutableDictionary *page = [NSMutableDictionary dictionary];
@@ -234,6 +252,7 @@
 	result[@"protocols"] = [self protocolsForIndex];
 	result[@"categories"] = [self categoriesForIndex];
     result[@"constants"] = [self constantsForIndex];
+    result[@"extendableTypedefEnums"] = [self extendableTypedefEnumsForIndex];
     result[@"blocks"] = [self blocksForIndex];
 	result[@"strings"] = self.settings.stringTemplates;
 	result[@"projectCompany"] = self.settings.projectCompany;
@@ -260,6 +279,7 @@
 	result[@"projectCompany"] = self.settings.projectCompany;
 	result[@"projectName"] = self.settings.projectName;
     result[@"externConstantDefinitions"] = [self externConstantDefinitionsForIndex];
+    result[@"extendableTypedefEnums"] = [self extendableTypedefEnumsForIndex];
 
 	[self registerObjectsUsageForIndexInDictionary:result];
 	return result;
@@ -348,6 +368,10 @@
     return [NSString stringWithFormat:template, object.constantName];
 }
 
+- (NSString *)pageTitleForExtendableTypedefEnumData:(GBExtendableTypedefEnumData *)object {
+    NSString *template = [self.settings.stringTemplates valueForKeyPath:@"objectPage.constantTitle"];
+    return [NSString stringWithFormat:template, object.typeDefName];
+}
 - (NSString *)pageTitleForBlock:(GBTypedefBlockData *)object {
     NSString *template = [self.settings.stringTemplates valueForKeyPath:@"objectPage.blockTitle"];
     return [NSString stringWithFormat:template, object.nameOfBlock];
@@ -401,6 +425,15 @@
 }
 
 - (NSDictionary *)specificationsForExternConstantDefinition:(GBExternConstantDefinition *)object {
+    NSMutableArray *result = [NSMutableArray array];
+    [self registerObjectDeclaredInSpecificationForProvider:object toArray:result];
+    [self registerObjectCompanionGuidesSpecificationForObject:object toArray:result];
+    [self registerObjectAvailabilitySpecificationForProvider:object toArray:result];
+    [self registerObjectReferenceSpecificationForProvider:object toArray:result];
+    return [self arrayDescriptorForArray:result];
+}
+
+- (NSDictionary *)specificationsForExtendedTypedefEnumData:(GBExtendableTypedefEnumData *)object {
     NSMutableArray *result = [NSMutableArray array];
     [self registerObjectDeclaredInSpecificationForProvider:object toArray:result];
     [self registerObjectCompanionGuidesSpecificationForObject:object toArray:result];
@@ -635,6 +668,13 @@
 		data[@"title"] = constant.nameOfEnum;
 		[result addObject:data];
 	}
+    for (GBTypedefEnumData *constant in constants) {
+        if (!constant.includeInOutput) continue;
+        NSMutableDictionary *data = [NSMutableDictionary dictionaryWithCapacity:2];
+        data[@"href"] = [self hrefForObject:constant fromObject:nil];
+        data[@"title"] = constant.nameOfEnum;
+        [result addObject:data];
+    }
 	return result;
 }
 
@@ -651,6 +691,18 @@
     return result;
 }
 
+- (NSArray *)extendableTypedefEnumsForIndex {
+    NSArray *typedefs = [self.store extendableTypedefEnumsSortedByName];
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[typedefs count]];
+    for (GBExtendableTypedefEnumData *typedefData in typedefs) {
+        if (!typedefData.includeInOutput) continue;
+        NSMutableDictionary *data = [NSMutableDictionary dictionaryWithCapacity:2];
+        data[@"href"] = [self hrefForObject:typedefData fromObject:nil];
+        data[@"title"] = typedefData.typeDefName;
+        [result addObject:data];
+    }
+    return result;
+}
 
 - (NSArray *)blocksForIndex {
     NSArray *blocks = [self.store blocksSortedByName];
@@ -742,6 +794,7 @@
 	BOOL protocols = [self.store.protocols count] > 0;
     BOOL constants = [self.store.constants count];
     BOOL externConstantDefinitions = [self.store.externConstantDefinitions count] > 0;
+    BOOL extendableTypedefEnums = [self.store.extendableTypedefEnums count] > 0;
     BOOL blocks = [self.store.blocks count] > 0;
     dict[@"hasDocs"] = @(documents);
     dict[@"hasClasses"] = @(classes);
@@ -749,9 +802,10 @@
 	dict[@"hasProtocols"] = @(protocols);
 	dict[@"hasConstants"] = @(constants);
     dict[@"hasExternConstantDefinitions"] = @(externConstantDefinitions);
+    dict[@"hasExtendableTypedefEnums"] = @(extendableTypedefEnums);
     dict[@"hasBlocks"] = @(blocks);
-	dict[@"hasProtocolsOrCategories"] = @(protocols || categories || constants || blocks || externConstantDefinitions);
-    dict[@"showConstants"] = @(constants || externConstantDefinitions);
+	dict[@"hasProtocolsOrCategories"] = @(protocols || categories || constants || blocks || externConstantDefinitions || extendableTypedefEnums);
+    dict[@"showConstants"] = @(constants || externConstantDefinitions || extendableTypedefEnums);
     
 }
 

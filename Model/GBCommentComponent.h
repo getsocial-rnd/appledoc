@@ -69,6 +69,8 @@
  */
 @property (readonly) NSString *htmlValue;
 
+@property (readonly) NSString *htmlValueAsComment;
+
 /** Component's text value, derived by passing assigned `markdownValue` through text processor.
  
  The result is suitable for using in documentation set tokens file. Using converted HTML may result in errors when indexing due to usage of escaped HTML symbols (for example any `&ndash;` would result in docsetutil error `Entity 'ndash' not defined`. This value is derived when first used, the value is cached afterwards and cached value is returned from subsequent calls. Internally [GBApplicationSettingsProvider stringByConvertingMarkdownToText:] is used for conversion.

@@ -33,6 +33,12 @@
 	return _htmlValue;
 }
 
+- (NSString *)htmlValueAsComment {
+    if (!self.settings) return [@"// " stringByAppendingString:self.markdownValue];
+    if (_htmlValue) return [@"// " stringByAppendingString:_htmlValue];
+    _htmlValue = [self.settings stringByConvertingMarkdownToHTML:self.markdownValue];
+    return [@"// " stringByAppendingString:_htmlValue];
+}
 - (NSString *)textValue {
 	if (!self.settings) return self.markdownValue;
 	if (_textValue) return _textValue;

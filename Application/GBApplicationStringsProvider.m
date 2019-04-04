@@ -84,6 +84,7 @@
 		result[@"exceptionsTitle"] = NSLocalizedString(@"Exceptions", @"Exceptions");
 		result[@"seeAlsoTitle"] = NSLocalizedString(@"See Also", @"See Also");
 		result[@"declaredInTitle"] = NSLocalizedString(@"Declared In", @"Declared In");
+        result[@"externConstantDefinitions"] = NSLocalizedString(@"Constants", @"Constants");
 	}
 	return result;
 }

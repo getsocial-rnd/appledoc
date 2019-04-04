@@ -14,6 +14,7 @@
 @class GBDocumentData;
 @class GBTypedefEnumData;
 @class GBTypedefBlockData;
+@class GBExternConstantDefinition;
 
 /** Implements the application's in-memory objects data store.
  
@@ -35,6 +36,8 @@
     NSMutableDictionary *_typedefBlocksByName;
     NSMutableSet *_customDocuments;
 	NSMutableDictionary *_customDocumentsByKey;
+    NSMutableSet *_externConstantDefinitions;
+    NSMutableDictionary *_externConstantDefinitionsByName;
 }
 
 + (instancetype) sharedStore;
@@ -130,6 +133,8 @@
 
 -(void)registerTypedefBlock:(GBTypedefBlockData *)typedefBlock;
 
+-(void)registerExternConstantDefinition:(GBExternConstantDefinition *)externConstantDefinition;
+
 ///---------------------------------------------------------------------------------------
 /// @name Data handling
 ///---------------------------------------------------------------------------------------
@@ -173,6 +178,8 @@
 - (GBTypedefEnumData *)typedefEnumWithName:(NSString *)name;
 
 - (GBTypedefBlockData *)typedefBlockWithName:(NSString *)name;
+
+- (GBExternConstantDefinition *)externConstantDefinitionWithName:(NSString *)name;
 
 /** Returns the document instance that matches the given path.
  
@@ -243,6 +250,8 @@
  */
 @property (readonly) NSSet *customDocuments;
 
+@property (readonly) NSSet *externConstantDefinitions;
+
 ///---------------------------------------------------------------------------------------
 /// @name Helper methods
 ///---------------------------------------------------------------------------------------
@@ -264,5 +273,8 @@
 
 /** Returns all registered protocols sorted by their name. */
 - (NSArray *)protocolsSortedByName;
+
+/** Returns all registered constants sorted by their name. */
+- (NSArray *)externConstantDefinitionsSortedByName;
 
 @end

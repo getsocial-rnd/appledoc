@@ -51,6 +51,7 @@
 	if (![self processProtocols:error]) return NO;
 	if (![self processDocuments:error]) return NO;
     if (![self processConstants:error]) return NO;
+    if (![self processExternConstantDefinitions:error]) return NO;
     if (![self processBlocks:error]) return NO;
 	if (![self processIndex:error]) return NO;
 	if (![self processHierarchy:error]) return NO;
@@ -125,6 +126,22 @@
 	return YES;
 }
 
+- (BOOL)processExternConstantDefinitions:(NSError **)error {
+    for (GBExternConstantDefinition *def in self.store.externConstantDefinitions) {
+        if (!def.includeInOutput) continue;
+        GBLogInfo(@"Generating output for extern constant def %@...", def);
+        NSDictionary *vars = [self.variablesProvider variablesForExternConstantDefinition:def withStore:self.store];
+        NSString *output = [self.htmlObjectTemplate renderObject: vars];
+        NSString *cleaned = [self stringByCleaningHtml:output];
+        NSString *path = [self htmlOutputPathForObject:def];
+        if (![self writeString:cleaned toFile:[path stringByStandardizingPath] error:error]) {
+            GBLogWarn(@"Failed writing HTML for constant declaration %@ to '%@'!", def, path);
+            return NO;
+        }
+        GBLogDebug(@"Finished generating output for extern constant def %@.", def);
+    }
+    return YES;
+}
 - (BOOL)processBlocks:(NSError **)error {
     for (GBTypedefBlockData *blockTypedef in self.store.blocks) {
         if (!blockTypedef.includeInOutput) continue;

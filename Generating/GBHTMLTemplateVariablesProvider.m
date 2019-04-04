@@ -38,11 +38,13 @@
 - (NSString *)pageTitleForDocument:(GBDocumentData *)object;
 - (NSString *)pageTitleForConstant:(GBTypedefEnumData *)object;
 - (NSString *)pageTitleForBlock:(GBTypedefBlockData *)object;
+- (NSString *)pageTitleForExternConstantDefinition:(GBExternConstantDefinition *)object;
 - (NSDictionary *)specificationsForClass:(GBClassData *)object;
 - (NSDictionary *)specificationsForCategory:(GBCategoryData *)object;
 - (NSDictionary *)specificationsForProtocol:(GBProtocolData *)object;
 - (NSDictionary *)specificationsForConstant:(GBTypedefEnumData *)object;
 - (NSDictionary *)specificationsForBlock:(GBTypedefBlockData *)object;
+- (NSDictionary *)specificationsForExternConstantDefinition:(GBExternConstantDefinition *)object;
 
 @end
 
@@ -76,6 +78,7 @@
 - (NSArray *)protocolsForIndex;
 - (NSArray *)classesForHierarchy;
 - (NSArray *)constantsForIndex;
+- (NSArray *)externConstantDefinitionsForIndex;
 - (NSArray *)blocksForIndex;
 - (NSArray *)arrayFromHierarchyLevel:(NSDictionary *)level;
 - (void)registerObjectsUsageForIndexInDictionary:(NSMutableDictionary *)dict;
@@ -165,6 +168,21 @@
 	return result;
 }
 
+- (NSDictionary *)variablesForExternConstantDefinition:(GBExternConstantDefinition *)externConstantDef withStore:(id)aStore {
+    self.store = aStore;
+    NSMutableDictionary *page = [NSMutableDictionary dictionary];
+    page[@"title"] = [self pageTitleForExternConstantDefinition:externConstantDef];
+    page[@"specifications"] = [self specificationsForExternConstantDefinition:externConstantDef];
+    [self addFooterVarsToDictionary:page];
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    result[@"page"] = page;
+    result[@"externConstantDefinition"] = externConstantDef;
+    result[@"projectCompany"] = self.settings.projectCompany;
+    result[@"projectName"] = self.settings.projectName;
+    result[@"strings"] = self.settings.stringTemplates;
+    return result;
+}
+
 - (NSDictionary *)variablesForBlocks:(GBTypedefBlockData *)typedefBlock withStore:(id)aStore {
     self.store = aStore;
     NSMutableDictionary *page = [NSMutableDictionary dictionary];
@@ -220,7 +238,7 @@
 	result[@"strings"] = self.settings.stringTemplates;
 	result[@"projectCompany"] = self.settings.projectCompany;
 	result[@"projectName"] = self.settings.projectName;
-	
+
 	[self addCustomDocumentWithKey:kGBCustomDocumentIndexDescKey toDictionary:result key:@"indexDescription"];
 	[self registerObjectsUsageForIndexInDictionary:result];
 	return result;
@@ -241,7 +259,8 @@
     result[@"strings"] = self.settings.stringTemplates;
 	result[@"projectCompany"] = self.settings.projectCompany;
 	result[@"projectName"] = self.settings.projectName;
-	
+    result[@"externConstantDefinitions"] = [self externConstantDefinitionsForIndex];
+
 	[self registerObjectsUsageForIndexInDictionary:result];
 	return result;
 }
@@ -256,6 +275,7 @@
 	if ([object isKindOfClass:[GBDocumentData class]] && ![[self.store documents] containsObject:object]) return nil;
 	if ([object isKindOfClass:[GBTypedefEnumData class]] && ![[self.store constants] containsObject:object]) return nil;
     if ([object isKindOfClass:[GBTypedefBlockData class]] && ![[self.store blocks] containsObject:object]) return nil;
+    if ([object isKindOfClass:[GBExternConstantDefinition class]] && ![[self.store externConstantDefinitions] containsObject:object]) return nil;
 	return [self.settings htmlReferenceForObject:object fromSource:source];
 }
 
@@ -323,6 +343,11 @@
 	return [NSString stringWithFormat:template, object.nameOfEnum];
 }
 
+- (NSString *)pageTitleForExternConstantDefinition:(GBExternConstantDefinition *)object {
+    NSString *template = [self.settings.stringTemplates valueForKeyPath:@"objectPage.constantTitle"];
+    return [NSString stringWithFormat:template, object.constantName];
+}
+
 - (NSString *)pageTitleForBlock:(GBTypedefBlockData *)object {
     NSString *template = [self.settings.stringTemplates valueForKeyPath:@"objectPage.blockTitle"];
     return [NSString stringWithFormat:template, object.nameOfBlock];
@@ -373,6 +398,15 @@
     [self registerObjectAvailabilitySpecificationForProvider:object toArray:result];
 	[self registerObjectReferenceSpecificationForProvider:object toArray:result];
 	return [self arrayDescriptorForArray:result];
+}
+
+- (NSDictionary *)specificationsForExternConstantDefinition:(GBExternConstantDefinition *)object {
+    NSMutableArray *result = [NSMutableArray array];
+    [self registerObjectDeclaredInSpecificationForProvider:object toArray:result];
+    [self registerObjectCompanionGuidesSpecificationForObject:object toArray:result];
+    [self registerObjectAvailabilitySpecificationForProvider:object toArray:result];
+    [self registerObjectReferenceSpecificationForProvider:object toArray:result];
+    return [self arrayDescriptorForArray:result];
 }
 
 - (NSDictionary *)specificationsForBlock:(GBProtocolData *)object {
@@ -604,6 +638,20 @@
 	return result;
 }
 
+- (NSArray *)externConstantDefinitionsForIndex {
+    NSArray *constants = [self.store externConstantDefinitionsSortedByName];
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[constants count]];
+    for (GBExternConstantDefinition *constant in constants) {
+        if (!constant.includeInOutput) continue;
+        NSMutableDictionary *data = [NSMutableDictionary dictionaryWithCapacity:2];
+        data[@"href"] = [self hrefForObject:constant fromObject:nil];
+        data[@"title"] = constant.constantName;
+        [result addObject:data];
+    }
+    return result;
+}
+
+
 - (NSArray *)blocksForIndex {
     NSArray *blocks = [self.store blocksSortedByName];
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:[blocks count]];
@@ -692,15 +740,19 @@
 	BOOL classes = [self.store.classes count] > 0;
 	BOOL categories = [self.store.categories count] > 0;
 	BOOL protocols = [self.store.protocols count] > 0;
-    BOOL constants = [self.store.constants count] > 0;
+    BOOL constants = [self.store.constants count];
+    BOOL externConstantDefinitions = [self.store.externConstantDefinitions count] > 0;
     BOOL blocks = [self.store.blocks count] > 0;
     dict[@"hasDocs"] = @(documents);
     dict[@"hasClasses"] = @(classes);
 	dict[@"hasCategories"] = @(categories);
 	dict[@"hasProtocols"] = @(protocols);
 	dict[@"hasConstants"] = @(constants);
+    dict[@"hasExternConstantDefinitions"] = @(externConstantDefinitions);
     dict[@"hasBlocks"] = @(blocks);
-	dict[@"hasProtocolsOrCategories"] = @(protocols || categories || constants || blocks);
+	dict[@"hasProtocolsOrCategories"] = @(protocols || categories || constants || blocks || externConstantDefinitions);
+    dict[@"showConstants"] = @(constants || externConstantDefinitions);
+    
 }
 
 @end

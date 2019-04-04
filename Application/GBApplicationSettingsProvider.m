@@ -534,6 +534,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBApplicationSettingsProvider, sharedApplicationS
         basePath = @"Blocks";
         name = [object nameOfBlock];
     }
+    else if ([object isKindOfClass:[GBExternConstantDefinition class]]) {
+        basePath = @"Constants";
+        name = [object constantName];
+    }
 	else if ([object isKindOfClass:[GBDocumentData class]]) {
 		GBDocumentData *document = object;
 		

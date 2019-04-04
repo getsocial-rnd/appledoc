@@ -84,6 +84,24 @@
 					</div>
 					{{/hasSections}}
 					{{/object.methods}}
+                    
+                    <!-- extern constants start -->
+                    {{#externConstantDefinition}}
+                    </br>
+                    {{#comment}}
+                    {{#hasLongDescription}}
+                    <div class="section section-overview">
+                        {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
+                    </div>
+                    {{/hasLongDescription}}
+                    {{/comment}}
+                    <div class="section">
+                    <h4 class="method-subtitle">Definition</h4>
+                    <div class="method-subsection method-declaration"><code>extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributes}}{{/hasAttributes}};</code></div>
+                    </div>
+                    </div>
+                    {{/externConstantDefinition}}
+                    <!-- extern constants end -->
 
                     {{#typedefEnum}}
                     <h3 class="subsubtitle method-title">{{nameOfEnum}}</h3>

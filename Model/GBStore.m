@@ -33,6 +33,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
         _typedefBlocksByName = [[NSMutableDictionary alloc] init];
 		_customDocuments = [[NSMutableSet alloc] init];
 		_customDocumentsByKey = [[NSMutableDictionary alloc] init];
+        _externConstantDefinitions = [[NSMutableSet alloc] init];
+        _externConstantDefinitionsByName = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -78,6 +80,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 	NSArray *descriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"protocolName" ascending:YES]];
 	return [[self.protocols allObjects] sortedArrayUsingDescriptors:descriptors];
 }
+
+- (NSArray *)externConstantDefinitionsSortedByName
+{
+    NSArray *descriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"constantName" ascending:YES]];
+    return [[self.externConstantDefinitions allObjects] sortedArrayUsingDescriptors:descriptors];
+}
+
 
 #pragma mark Registration handling
 
@@ -134,6 +143,21 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 
 	[_typedefEnums addObject:typedefEnum];
 	_typedefEnumsByName[typedefEnum.nameOfEnum] = typedefEnum;
+}
+
+-(void)registerExternConstantDefinition:(GBExternConstantDefinition *)externConstantDef
+{
+    NSParameterAssert(externConstantDef != nil);
+    GBLogDebug(@"Registering extern constant def %@...", externConstantDef);
+    if ([_externConstantDefinitions containsObject:externConstantDef]) return;
+    GBExternConstantDefinition *existingExternConstantDef = _externConstantDefinitionsByName[externConstantDef.constantName];
+    if (existingExternConstantDef) {
+        GBLogWarn(@"Ignoring extern constant def %@, already defined.", existingExternConstantDef);
+        return;
+    }
+    
+    [_externConstantDefinitions addObject:externConstantDef];
+    _externConstantDefinitionsByName[externConstantDef.constantName] = externConstantDef;
 }
 
 -(void)registerTypedefBlock:(GBTypedefBlockData *)typedefBlock
@@ -223,6 +247,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 	return _customDocumentsByKey[key];
 }
 
+- (GBExternConstantDefinition*)externConstantDefinitionWithName:(NSString *)name
+{
+    return _externConstantDefinitionsByName[name];
+}
+
 @synthesize classes = _classes;
 @synthesize categories = _categories;
 @synthesize protocols = _protocols;
@@ -230,5 +259,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 @synthesize blocks = _typedefBlocks;
 @synthesize documents = _documents;
 @synthesize customDocuments = _customDocuments;
+@synthesize externConstantDefinitions = _externConstantDefinitions;
 
 @end

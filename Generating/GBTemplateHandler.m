@@ -110,7 +110,7 @@ static NSString *kGBValueKey = @"value";
 - (NSString *)renderObject:(id)object {
 	GBLogVerbose(@"Rendering %@...", [[object description] normalizedDescription]);
 	if (!_template) {
-		GBLogWarn(@"No template loaded or parsed, ignoring redering!");
+		GBLogWarn(@"No template loaded or parsed, ignoring rendering!");
 		return @"";
 	}
     NSError* error = nil;

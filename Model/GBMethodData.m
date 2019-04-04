@@ -239,7 +239,9 @@
             if (!(referencedObject = [[GBStore sharedStore] protocolWithName: value])) {
                 if (!(referencedObject = [[GBStore sharedStore] typedefEnumWithName: value])) {
                     if (!(referencedObject = [[GBStore sharedStore] typedefBlockWithName: value])) {
-                        referencedObject = [[GBStore sharedStore] documentWithName: value];
+                        if (!(referencedObject = [[GBStore sharedStore] externConstantDefinitionWithName: value])) {
+                            referencedObject = [[GBStore sharedStore] documentWithName: value];
+                        }
                     }
                 }
             }

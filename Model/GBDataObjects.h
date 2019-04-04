@@ -25,6 +25,7 @@
 #import "GBMethodArgument.h"
 #import "GBMethodSectionData.h"
 #import "GBSourceInfo.h"
+#import "GBExternConstantDefinition.h"
 
 #import "GBAdoptedProtocolsProvider.h"
 #import "GBIvarsProvider.h"

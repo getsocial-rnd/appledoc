@@ -177,6 +177,7 @@
 		B4D1FFE515FF5F05009736E2 /* DDXcodeProjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		B4D1FFE615FF5F05009736E2 /* DDXcodeProjectFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		B8BBC0F7196DFAEB006F239D /* dd_getopt_long-fbsd.m in Sources */ = {isa = PBXBuildFile; fileRef = DA77C690196BEB2C0018A48F /* dd_getopt_long-fbsd.m */; };
+		BC78C64E2253FD3E00C28514 /* GBExternConstantDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */; };
 		C8005C9D1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = C8005C9C1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m */; };
 		C8005C9E1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = C8005C9C1B9E016400F91ECC /* GBCommentsProcessor+CodeBlockProcessing.m */; };
 		D4B844EC17A121040012C1DC /* GBTypedefEnumData.m in Sources */ = {isa = PBXBuildFile; fileRef = D4B844EB17A121030012C1DC /* GBTypedefEnumData.m */; };
@@ -394,6 +395,8 @@
 		B4D1FFD315FF5F05009736E2 /* DDXcodeProjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDXcodeProjectFile.h; sourceTree = "<group>"; };
 		B4D1FFD415FF5F05009736E2 /* DDXcodeProjectFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDXcodeProjectFile.m; sourceTree = "<group>"; };
 		B4D1FFF615FF643D009736E2 /* install-appledoc.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-appledoc.sh"; sourceTree = "<group>"; };
+		BC78C64C2253FD3E00C28514 /* GBExternConstantDefinition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBExternConstantDefinition.h; sourceTree = "<group>"; };
+		BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GBExternConstantDefinition.m; sourceTree = "<group>"; };
 		C567680F1958403800E8E4C8 /* GBTypedefBlockData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBTypedefBlockData.h; sourceTree = "<group>"; };
 		C56768101958403800E8E4C8 /* GBTypedefBlockData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBTypedefBlockData.m; sourceTree = "<group>"; };
 		C5676812195840BD00E8E4C8 /* GBTypedefBlockArgument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBTypedefBlockArgument.h; sourceTree = "<group>"; };
@@ -736,6 +739,8 @@
 				C56768101958403800E8E4C8 /* GBTypedefBlockData.m */,
 				C5676812195840BD00E8E4C8 /* GBTypedefBlockArgument.h */,
 				C5676813195840BD00E8E4C8 /* GBTypedefBlockArgument.m */,
+				BC78C64C2253FD3E00C28514 /* GBExternConstantDefinition.h */,
+				BC78C64D2253FD3E00C28514 /* GBExternConstantDefinition.m */,
 			);
 			name = Store;
 			sourceTree = "<group>";
@@ -1276,6 +1281,7 @@
 				73397A2812A5070700EDC035 /* GBTask.m in Sources */,
 				732E6CBD12DF02B7009DD6E0 /* NSArray+GBArray.m in Sources */,
 				7335F72B12E58DCC0094F72E /* GBDocSetInstallGenerator.m in Sources */,
+				BC78C64E2253FD3E00C28514 /* GBExternConstantDefinition.m in Sources */,
 				425CC22E20488BEA0099B364 /* GBHTMLOutputGenerator.m in Sources */,
 				7335F72E12E58E160094F72E /* GBDocSetPublishGenerator.m in Sources */,
 				735B23811304024600704844 /* GBDocumentData.m in Sources */,

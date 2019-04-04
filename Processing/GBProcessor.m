@@ -20,6 +20,7 @@
 - (void)processConstants;
 - (void)processBlocks;
 - (void)processDocuments;
+- (void)processExternConstantDefinition;
 
 - (void)processMethodsFromProvider:(GBMethodsProvider *)provider;
 - (void)processCommentForObject:(GBModelBase *)object;
@@ -81,6 +82,7 @@
     [self processConstants];
     [self processBlocks];
 	[self processDocuments];
+    [self processExternConstantDefinition];
 }
 
 - (void)processClasses {
@@ -97,6 +99,20 @@
 		}
 		GBLogDebug(@"Finished processing class %@.", class);
 	}
+}
+
+- (void)processExternConstantDefinition {
+    NSArray *defs = [self.store.externConstantDefinitions allObjects];
+    for (GBExternConstantDefinition *def in defs) {
+        GBLogInfo(@"Processing extern constant def %@...", def);
+        self.currentContext = def;
+        if (![self removeUndocumentedObject:def]) {
+            [self processCommentForObject:def];
+            [self validateCommentsForObjectAndMembers:def];
+            [self processHtmlReferencesForObject:def];
+        }
+        GBLogDebug(@"Finished processing extern constant def %@.", def);
+    }
 }
 
 - (void)processCategories {
@@ -220,6 +236,7 @@
 - (void)processCommentForObject:(GBModelBase *)object {
 	// Processes the comment for the given object. If the comment is not valid, it's forced to nil to make simpler work for template engine later on. Note that comment is considered invalid if the object isn't commented or has comment, but it's string value is nil or empty string.
 	if (![self isCommentValid:object.comment]) {
+        GBLogDebug(@"Comment is invalid for [%@]", object);
 		object.comment = nil;
 		return;
 	}

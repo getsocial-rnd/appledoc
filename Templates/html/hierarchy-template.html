@@ -57,14 +57,17 @@
 							{{/protocols}}
 						</ul>
 						{{/hasProtocols}}
-	                    {{#hasConstants}}
+                        {{#showConstants}}
 						<h2 class="index-title">{{strings.hierarchyPage.constantsTitle}}</h2>
 						<ul>
 	                        {{#constants}}
 	                        <li><a href="{{href}}">{{title}}</a></li>
 	                        {{/constants}}
+                            {{#externConstantDefinitions}}
+                            <li><a href="{{href}}">{{title}}</a></li>
+                            {{/externConstantDefinitions}}
 						</ul>
-						{{/hasConstants}}
+						{{/showConstants}}
 						{{#hasCategories}}
 						<h2 class="index-title">{{strings.hierarchyPage.categoriesTitle}}</h2>
 						<ul>

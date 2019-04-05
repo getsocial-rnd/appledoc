@@ -188,6 +188,7 @@
 
 - (GBExtendableTypedefEnumData *)extendableTypedefEnumDataWithName:(NSString *)name;
 
+
 /** Returns the document instance that matches the given path.
  
  If no registered document matches the given path, `nil` is returned.
@@ -285,6 +286,10 @@
 
 /** Returns all registered constants sorted by their name. */
 - (NSArray *)externConstantDefinitionsSortedByName;
+- (NSArray *)externConstantDefinitionsSortedByNameDefinedInClass:(NSString*)className;
 - (NSArray *)extendableTypedefEnumsSortedByName;
+- (NSArray *)extendableTypedefEnumsSortedByNameDefinedInClass:(NSString*)className;
+- (NSArray *)constantsSortedByNameDefinedInClass:(NSString*)className;
+- (NSArray *)blockDefinitionsSortedByNameDefinedInClass:(NSString*)className;
 
 @end

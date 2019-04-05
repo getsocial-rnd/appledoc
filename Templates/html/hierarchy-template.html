@@ -61,14 +61,17 @@
 						<h2 class="index-title">{{strings.hierarchyPage.constantsTitle}}</h2>
 						<ul>
 	                        {{#constants}}
-	                        <li><a href="{{href}}">{{title}}</a></li>
+	                        <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
 	                        {{/constants}}
                             {{#externConstantDefinitions}}
-                            <li><a href="{{href}}">{{title}}</a></li>
+                            <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
                             {{/externConstantDefinitions}}
                             {{#extendableTypedefEnums}}
-                            <li><a href="{{href}}">{{title}}</a></li>
+                            <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
                             {{/extendableTypedefEnums}}
+                            {{#blocks}}
+                            <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
+                            {{/blocks}}
 						</ul>
 						{{/showConstants}}
 						{{#hasCategories}}

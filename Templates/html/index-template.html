@@ -88,11 +88,17 @@
 							<h2 class="index-title">{{strings.indexPage.constantsTitle}}</h2>
 							<ul>
 								{{#constants}}
-									<li><a href="{{href}}">{{title}}</a></li>
+									<li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
 								{{/constants}}
                                 {{#extendableTypedefEnums}}
-                                <li><a href="{{href}}">{{title}}</a></li>
+                                <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
                                 {{/extendableTypedefEnums}}
+                                {{#externConstantDefinitions}}
+                                <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
+                                {{/externConstantDefinitions}}
+                                {{#blocks}}
+                                <li><a href="{{href}}#//api/name/{{title}}">{{title}}</a></li>
+                                {{/blocks}}
 							</ul>
 							{{/showConstants}}
 

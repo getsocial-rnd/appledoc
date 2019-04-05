@@ -59,6 +59,9 @@
 - (BOOL)matchObjectDeclaration;
 - (BOOL)matchTypedefEnumDefinition;
 - (BOOL)matchTypedefBlockDefinitionForProvider;
+- (BOOL)matchExtendableTypedefEnum;
+- (BOOL)matchExternConstantDefinition;
+
 - (BOOL)matchMethodDataForProvider:(GBMethodsProvider *)provider from:(NSString *)start to:(NSString *)end required:(BOOL)required;
 - (void)registerComment:(GBComment *)comment toObject:(GBModelBase *)object startingWith:(PKToken *)startToken;
 - (void)registerLastCommentToObject:(GBModelBase *)object;

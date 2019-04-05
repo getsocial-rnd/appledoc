@@ -119,10 +119,30 @@
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	result[@"page"] = page;
 	result[@"object"] = object;
-	result[@"projectCompany"] = self.settings.projectCompany;
-	result[@"projectName"] = self.settings.projectName;
-	result[@"strings"] = self.settings.stringTemplates;
-	return result;
+    result[@"projectCompany"] = self.settings.projectCompany;
+    result[@"projectName"] = self.settings.projectName;
+    result[@"strings"] = self.settings.stringTemplates;
+
+    // get constants defined in class
+    NSArray* filteredExternConstantDefinitons = [self.store externConstantDefinitionsSortedByNameDefinedInClass:object.prefferedSourceInfo.filename];
+    NSArray* filteredExtendableTypeEnums = [self.store extendableTypedefEnumsSortedByNameDefinedInClass:object.prefferedSourceInfo.filename];
+    NSArray* filteredTypedefEnums = [self.store constantsSortedByNameDefinedInClass:object.prefferedSourceInfo.filename];
+    NSArray* filteredBlockDefinitions = [self.store blockDefinitionsSortedByNameDefinedInClass:object.prefferedSourceInfo.filename];
+
+    BOOL hasExternConstantsDefined = filteredExternConstantDefinitons.count > 0;
+    BOOL hasExtendableTypedefEnumsDefined = filteredExtendableTypeEnums.count > 0;
+    BOOL hasConstants = filteredTypedefEnums.count > 0;
+    BOOL hasBlocks = filteredBlockDefinitions.count > 0;
+    result[@"externConstantDefinitions"] = filteredExternConstantDefinitons;
+    result[@"extendableTypedefEnums"] = filteredExtendableTypeEnums;
+    result[@"typedefEnums"] = filteredTypedefEnums;
+    result[@"blockDefinitions"] = filteredBlockDefinitions;
+
+    if (hasExternConstantsDefined || hasExtendableTypedefEnumsDefined || hasConstants || hasBlocks) {
+        result[@"showConstantsInsideClass"] = @(YES);
+    }
+
+    return result;
 }
 
 - (NSDictionary *)variablesForCategory:(GBCategoryData *)object withStore:(id)aStore {
@@ -164,7 +184,7 @@
 	[self addFooterVarsToDictionary:page];
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	result[@"page"] = page;
-	result[@"typedefEnum"] = typedefEnum;
+	result[@"typedefEnums"] = typedefEnum;
 	result[@"projectCompany"] = self.settings.projectCompany;
 	result[@"projectName"] = self.settings.projectName;
 	result[@"strings"] = self.settings.stringTemplates;
@@ -179,7 +199,7 @@
     [self addFooterVarsToDictionary:page];
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     result[@"page"] = page;
-    result[@"externConstantDefinition"] = externConstantDef;
+    result[@"externConstantDefinitions"] = externConstantDef;
     result[@"projectCompany"] = self.settings.projectCompany;
     result[@"projectName"] = self.settings.projectName;
     result[@"strings"] = self.settings.stringTemplates;
@@ -194,7 +214,7 @@
     [self addFooterVarsToDictionary:page];
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     result[@"page"] = page;
-    result[@"extendableTypedefEnumData"] = extendableTypedefEnum;
+    result[@"extendableTypedefEnums"] = extendableTypedefEnum;
     result[@"projectCompany"] = self.settings.projectCompany;
     result[@"projectName"] = self.settings.projectName;
     result[@"strings"] = self.settings.stringTemplates;
@@ -209,7 +229,7 @@
     [self addFooterVarsToDictionary:page];
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     result[@"page"] = page;
-    result[@"typedefBlock"] = typedefBlock;
+    result[@"blockDefinitions"] = typedefBlock;
     result[@"projectCompany"] = self.settings.projectCompany;
     result[@"projectName"] = self.settings.projectName;
     result[@"strings"] = self.settings.stringTemplates;
@@ -253,6 +273,7 @@
 	result[@"categories"] = [self categoriesForIndex];
     result[@"constants"] = [self constantsForIndex];
     result[@"extendableTypedefEnums"] = [self extendableTypedefEnumsForIndex];
+    result[@"externConstantDefinitions"] = [self externConstantDefinitionsForIndex];
     result[@"blocks"] = [self blocksForIndex];
 	result[@"strings"] = self.settings.stringTemplates;
 	result[@"projectCompany"] = self.settings.projectCompany;

@@ -73,6 +73,7 @@
 					{{#hasSections}}
 					<div class="section section-tasks">
 						<a title="{{strings.objectTasks.title}}" name="tasks"></a>
+                        <h2 class="subtitle subtitle-overview">Properties and Methods</h2>
 						{{#sections}}
 
 						{{#sectionName}}<a title="{{#sectionName}}{{.}}{{/sectionName}}" name="task_{{#sectionName}}{{.}}{{/sectionName}}"></a>{{/sectionName}}
@@ -85,123 +86,37 @@
 					{{/hasSections}}
 					{{/object.methods}}
                     
-                    <!-- extern constants start -->
-                    {{#externConstantDefinition}}
-                    </br>
-                    {{#comment}}
-                    {{#hasLongDescription}}
+                    <!-- constants shown inside class page start -->
+                    {{#showConstantsInsideClass}}
                     <div class="section section-overview">
-                        {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
+                        <h2 class="subtitle subtitle-overview">Constants</h2>
                     </div>
-                    {{/hasLongDescription}}
-                    {{/comment}}
-                    <div class="section">
-                    <h4 class="method-subtitle">Definition</h4>
-                    <div class="method-subsection method-declaration"><code>extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};</code></div>
-                    </div>
-                    </div>
-                    {{/externConstantDefinition}}
+                    {{/showConstantsInsideClass}}
+
+                    <!-- extern constants start -->
+                    {{#externConstantDefinitions}}
+                    {{>ExternConstantDefinition}}
+                    {{/externConstantDefinitions}}
                     <!-- extern constants end -->
 
                     <!-- extendable typedef enums start -->
-                    {{#extendableTypedefEnumData}}
-                    </br>
-                    {{#comment}}
-                    {{#hasLongDescription}}
-                    <div class="section section-overview">
-                        {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
-                    </div>
-                    {{/hasLongDescription}}
-                    {{/comment}}
-                    <div class="section">
-                        <h4 class="method-subtitle">Definition</h4>
-                        <div class="method-subsection method-declaration"><code>typedef {{typeDefType}} {{typeDefName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};</code></div>
-                    </div>
-                    {{#hasPredefinedValues}}
-                    <div class="section">
-                        <h4 class="method-subtitle">Predefined values</h4>
-                        {{#predefinedValues}}
-                        </br>
-                        <div class="method-subsection method-declaration">
-                            <code>
-                                {{#comment}}
-                                {{#hasLongDescription}}
-                                {{#longDescription}}{{>GBCommentComponentsListAsText}}</br>{{/longDescription}}
-                                {{/hasLongDescription}}
-                                {{/comment}}
-                                extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};
-                            </code>
-                        </div>
-                        {{/predefinedValues}}
-                    </div>
-                    {{/hasPredefinedValues}}
-                    {{/extendableTypedefEnumData}}
-                    <!-- extendable typedef enums start -->
+                    {{#extendableTypedefEnums}}
+                    {{>ExtendableTypedefEnumDefinition}}
+                    {{/extendableTypedefEnums}}
+                    <!-- extendable typedef enums end -->
 
-                    {{#typedefEnum}}
-                    <h3 class="subsubtitle method-title">{{nameOfEnum}}</h3>
-                    {{#comment}}
-					{{#hasLongDescription}}
-					<div class="section section-overview">
-                        {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
-					</div>
-					{{/hasLongDescription}}
-					{{/comment}}
-                    <div class="section">
-                        <!-- display enum values -->
-                        {{#constants}}
-                        <h4 class="method-subtitle">Definition</h4>
-                        <code>typedef {{enumStyle}}({{enumPrimitive}}, {{nameOfEnum}} ) {<br>
-                            {{#constants}}
-                            &nbsp;&nbsp; <a href="{{htmlLocalReference}}">{{name}}</a>{{#hasAssignedValue}} = {{assignedValue}}{{/hasAssignedValue}},<br>
-                            {{/constants}}
-                            };</code>
-                    {{/constants}}
-                    </div>
-                    {{#constants}}
-                    <div class="section section-methods">
-                        <h4 class="method-subtitle">Constants</h4>
-                        <dl class="termdef">
-                            {{#constants}}
-                            {{>Constant}}
-                            {{/constants}}
-                        </dl>
-                    </div>
-                    {{/constants}}
+                    <!-- typedef enums start -->
+                    {{#typedefEnums}}
+                    {{>TypedefEnumDefinition}}
+                    {{/typedefEnums}}
+                    <!-- typedef enums end -->
 
-                    {{#comment}}
-                    {{#hasAvailability}}
-                    <div class="method-subsection availability">
-                        <h4 class="method-subtitle parameter-title">{{strings.objectMethods.availability}}</h4>
-                        {{#availability}}{{>GBCommentComponentsList}}{{/availability}}
-                    </div>
-                    {{/hasAvailability}}
+                    <!-- typedef blocks start -->
+                    {{#blockDefinitions}}
+                    {{>BlocksDefList}}
+                    {{/blockDefinitions}}
+                    <!-- typedef blocks end -->
 
-                    {{#hasRelatedItems}}
-                    <div class="method-subsection see-also-section">
-                        <h4 class="method-subtitle">{{strings.objectMethods.seeAlsoTitle}}</h4>
-                        <ul>
-                            {{#relatedItems.components}}
-                            <li><code>{{>GBCommentComponent}}</code></li>
-                            {{/relatedItems.components}}
-                        </ul>
-                    </div>
-                    {{/hasRelatedItems}}
-
-                    {{#prefferedSourceInfo}}
-                    <div class="method-subsection declared-in-section">
-                        <h4 class="method-subtitle">{{strings.objectMethods.declaredInTitle}}</h4>
-                        <p><code class="declared-in-ref">{{filename}}</code></p>
-                    </div>
-                    {{/prefferedSourceInfo}}
-                    {{/comment}}
-                    {{/typedefEnum}}
-                    
-          {{#typedefBlock}}
-          <a title="{{strings.objectMethods.blockDefTitle}}" name="instance_methods"></a>
-          <h4 class="method-subtitle parameter-title">{{strings.objectMethods.blockDefTitle}}</h4>
-          {{>BlocksDefList}}
-          {{/typedefBlock}}
 				</main>
 
 				<footer>
@@ -315,6 +230,149 @@ Section Method
 </div>
 EndSection
 
+Section LongCommentInOverview
+{{#comment}}
+{{#hasLongDescription}}
+<div class="section section-overview">
+    {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
+</div>
+{{/hasLongDescription}}
+{{/comment}}
+EndSection
+
+Section ExternConstantDefinition
+<div class="section-method">
+    <a name="//api/name/{{constantName}}" title="{{constantName}}"></a>
+    <h3 class="method-title"><code><a href="#//api/name/{{constantName}}">{{constantName}}</a></code></h3>
+    <div class="method-info">
+        <div class="pointy-thing"></div>
+        <div class="method-info-container">
+            {{#comment}}
+            {{#hasShortDescription}}
+            <div class="method-subsection brief-description">
+                {{#shortDescription}}{{>GBCommentComponent}}{{/shortDescription}}
+            </div>
+            {{/hasShortDescription}}
+            {{/comment}}
+            <div class="method-subsection method-declaration"><code>{{>ExternConstant}}</code></div>
+        </div>
+    </div>
+</div>
+EndSection
+
+Section TypedefEnumDefinition
+<div class="section-method">
+    <a name="//api/name/{{nameOfEnum}}" title="{{nameOfEnum}}"></a>
+    <h3 class="method-title"><code><a href="#//api/name/{{nameOfEnum}}">{{nameOfEnum}}</a></code></h3>
+    <div class="method-info">
+        <div class="pointy-thing"></div>
+        <div class="method-info-container">
+            {{#comment}}
+            {{#hasShortDescription}}
+            <div class="method-subsection brief-description">
+                {{#shortDescription}}{{>GBCommentComponent}}{{/shortDescription}}
+            </div>
+            {{/hasShortDescription}}
+            {{/comment}}
+            <div class="method-subsection method-declaration"><code>typedef {{enumStyle}}({{enumPrimitive}}, {{nameOfEnum}} ) {<br>
+                {{#constants}}
+                {{>EnumConstants}}
+                {{/constants}}
+                };</code>
+            </div>
+            <h3 class="method-title">Defined Values</h3>
+            {{#constants}}
+            {{>DescriptionOfEnumConstants}}
+            {{/constants}}
+        </div>
+    </div>
+</div>
+EndSection
+
+Section EnumConstants
+{{#constants}}
+&nbsp;&nbsp;&nbsp;&nbsp;{{name}}{{#hasAssignedValue}} = {{assignedValue}}{{/hasAssignedValue}},<br>
+{{/constants}}
+EndSection
+
+Section DescriptionOfEnumConstants
+{{#constants}}
+<div class="method-subsection method-declaration">
+    <code>
+{{#comment}}
+{{#hasShortDescription}}
+{{#shortDescription}}// {{>GBCommentComponentAsText}}</br>{{/shortDescription}}
+{{/hasShortDescription}}
+{{htmlReferenceName}} {{name}}{{#hasAssignedValue}} = {{assignedValue}}{{/hasAssignedValue}}
+{{/comment}}
+    </br></code>
+</div>
+{{/constants}}
+EndSection
+
+Section BlocksDefList
+<div class="section-method">
+    <a name="//api/name/{{nameOfBlock}}" title="{{nameOfBlock}}"></a>
+    <h3 class="method-title"><code><a href="#//api/name/{{nameOfBlock}}">{{nameOfBlock}}</a></code></h3>
+    <div class="method-info">
+        <div class="pointy-thing"></div>
+        <div class="method-info-container">
+            {{#comment}}
+            {{#hasShortDescription}}
+            <div class="method-subsection brief-description">
+                {{#shortDescription}}{{>GBCommentComponent}}{{/shortDescription}}
+            </div>
+            {{/hasShortDescription}}
+            {{/comment}}
+            <div class="method-subsection method-declaration">
+                <code>typedef {{returnType}} (^{{nameOfBlock}}) ({{&htmlParameterList}})</code>
+            </div>
+        </div>
+    </div>
+</div>
+EndSection
+
+
+Section ExtendableTypedefEnumDefinition
+<div class="section-method">
+    <a name="//api/name/{{typeDefName}}" title="{{typeDefName}}"></a>
+    <h3 class="method-title"><code><a href="#//api/name/{{typeDefName}}">{{typeDefName}}</a></code></h3>
+    <div class="method-info">
+        <div class="pointy-thing"></div>
+        <div class="method-info-container">
+            {{#comment}}
+            {{#hasShortDescription}}
+            <div class="method-subsection brief-description">
+                {{#shortDescription}}{{>GBCommentComponent}}{{/shortDescription}}
+            </div>
+            {{/hasShortDescription}}
+            {{/comment}}
+            <div class="method-subsection method-declaration"><code>typedef {{typeDefType}} {{typeDefName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};</code>
+            </div>
+            <h3 class="method-title">Defined Values</h2>
+            {{#predefinedValues}}
+            {{>PredefinedConstantValue}}
+            {{/predefinedValues}}
+        </div>
+    </div>
+</div>
+EndSection
+
+Section PredefinedConstantValue
+<div class="method-subsection method-declaration">
+    <code>
+        {{#comment}}
+        // {{stringValue}}</br>
+        {{/comment}}
+        {{>ExternConstant}}
+    </code>
+</div>
+EndSection
+
+Section ExternConstant
+extern {{constantType}} {{constantName}}{{#hasAttributes}} {{attributesDescription}}{{/hasAttributes}};
+EndSection
+
 Section MethodDeclaration
 {{#formattedComponents}}{{#emphasized}}<em>{{/emphasized}}{{#href}}<a href="{{&href}}">{{/href}}{{value}}{{#href}}</a>{{/href}}{{#emphasized}}</em>{{/emphasized}}{{/formattedComponents}}
 EndSection
@@ -331,7 +389,7 @@ Section TaskMethod
 EndSection
 
 Section TaskSelector
-{{#isInstanceMethod}}&ndash;{{/isInstanceMethod}}{{#isClassMethod}}+{{/isClassMethod}}{{#isProperty}}&nbsp;{{/isProperty}}&nbsp;{{methodSelector}}
+{{#isInstanceMethod}}&ndash;{{/isInstanceMethod}}{{#isClassMethod}}+{{/isClassMethod}}{{#isProperty}}@property{{/isProperty}}&nbsp;{{methodSelector}}
 EndSection
 
 
@@ -342,55 +400,6 @@ EndSection
 Section GBCommentComponentsListAsText
 {{#components}}// {{>GBCommentComponentAsText}}{{/components}}
 EndSection
-
-Section BlocksDefList
-<h3 class="subsubtitle method-title">{{nameOfBlock}}</h3>
-{{#comment}}
-{{#hasShortDescription}}
-<div class="method-subsection brief-description">
-  {{#shortDescription}}{{>GBCommentComponent}}{{/shortDescription}}
-</div>
-{{/hasShortDescription}}
-{{/comment}}
-
-<code>typedef {{returnType}} (^{{nameOfBlock}}) ({{&htmlParameterList}})</code>
-  
-  {{#comment}}
-  {{#hasLongDescription}}
-  <div class="method-subsection discussion-section">
-  <h4 class="method-subtitle">{{strings.objectMethods.discussionTitle}}</h4>
-  {{#longDescription}}{{>GBCommentComponentsList}}{{/longDescription}}
-  </div>
-  {{/hasLongDescription}}
-  {{/comment}}
-  
-  {{#comment}}
-  {{#hasAvailability}}
-  <div class="method-subsection availability">
-  <h4 class="method-subtitle parameter-title">{{strings.objectMethods.availability}}</h4>
-  {{#availability}}{{>GBCommentComponentsList}}{{/availability}}
-  </div>
-  {{/hasAvailability}}
-  
-  {{#hasRelatedItems}}
-  <div class="method-subsection see-also-section">
-  <h4 class="method-subtitle">{{strings.objectMethods.seeAlsoTitle}}</h4>
-  <ul>
-  {{#relatedItems.components}}
-  <li><code>{{>GBCommentComponent}}</code></li>
-  {{/relatedItems.components}}
-  </ul>
-  </div>
-  {{/hasRelatedItems}}
-  
-  {{#prefferedSourceInfo}}
-  <div class="method-subsection declared-in-section">
-  <h4 class="method-subtitle">{{strings.objectMethods.declaredInTitle}}</h4>
-  <code class="declared-in-ref">{{filename}}</code><br />
-  </div>
-  {{/prefferedSourceInfo}}
-  {{/comment}}
-  EndSection
 
 Section Constant
 <dt><a name="{{htmlReferenceName}}" title="{{name}}"></a><code>{{name}}</code></dt>

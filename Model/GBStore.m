@@ -95,6 +95,41 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
     return [[self.extendableTypedefEnums allObjects] sortedArrayUsingDescriptors:descriptors];
 }
 
+- (NSArray *)externConstantDefinitionsSortedByNameDefinedInClass:(NSString*)className
+{
+
+    NSMutableArray* definitions = [[self externConstantDefinitionsSortedByName] mutableCopy];
+    return [self filterModelObjects:definitions bySourceClass:className];
+}
+
+- (NSArray*)extendableTypedefEnumsSortedByNameDefinedInClass:(NSString *)className
+{
+    NSMutableArray* definitions = [[self extendableTypedefEnumsSortedByName] mutableCopy];
+    return [self filterModelObjects:definitions bySourceClass:className];
+}
+
+- (NSArray *)constantsSortedByNameDefinedInClass:(NSString*)className
+{
+    NSMutableArray* definitions = [[self constantsSortedByName] mutableCopy];
+    return [self filterModelObjects:definitions bySourceClass:className];
+}
+
+- (NSArray *)blockDefinitionsSortedByNameDefinedInClass:(NSString*)className
+{
+    NSMutableArray* definitions = [[self blocksSortedByName] mutableCopy];
+    return [self filterModelObjects:definitions bySourceClass:className];
+}
+
+- (NSArray*)filterModelObjects:(NSMutableArray<GBModelBase*>*)modelObjects bySourceClass:(NSString*)className
+{
+    NSMutableArray* filteredObjects = [NSMutableArray array];
+    [modelObjects enumerateObjectsUsingBlock:^(GBModelBase*  modelBase, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([modelBase.prefferedSourceInfo.filename isEqualToString:className]) {
+            [filteredObjects addObject:modelBase];
+        }
+    }];
+    return filteredObjects;
+}
 
 #pragma mark Registration handling
 
@@ -164,13 +199,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
         return;
     }
     
-    [_externConstantDefinitions addObject:externConstantDef];
-    _externConstantDefinitionsByName[externConstantDef.constantName] = externConstantDef;
-    
     // check if there is a typedef to add this as possible value
     GBExtendableTypedefEnumData* typeDef = [self extendableTypedefEnumDataWithName:externConstantDef.constantType];
     if (typeDef) {
         [typeDef addPredefinedValue:externConstantDef];
+    } else {
+        [_externConstantDefinitions addObject:externConstantDef];
+        _externConstantDefinitionsByName[externConstantDef.constantName] = externConstantDef;
     }
 }
 
@@ -285,6 +320,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GBStore, sharedStore);
 {
     return _extendableTypedefEnumsByName[name];
 }
+
+
 
 @synthesize classes = _classes;
 @synthesize categories = _categories;
